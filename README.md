@@ -58,17 +58,26 @@ Google Calendarの予定IDは公式URLから作ります。公式側で開始日
 
 ### 1. Repository secrets
 
-リポジトリの`Settings` → `Secrets and variables` → `Actions` → `Secrets`へ、次の3件を登録します。
+リポジトリの`Settings` → `Secrets and variables` → `Actions` → `Secrets`へ、Discord通知用のSecretを登録します。
 
 | 名前 | 内容 | 用途 |
 |---|---|---|
 | `DISCORD_WEBHOOK_URL` | 通知先DiscordチャンネルのWebhook URL | Discord通知 |
+
+Google CalendarをGitHub Actionsから直接更新したい場合だけ、次の2件も登録します。
+
+| 名前 | 内容 | 用途 |
+|---|---|---|
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | GoogleサービスアカウントJSONの全文、またはBase64文字列 | Calendar認証 |
 | `GOOGLE_CALENDAR_ID` | 登録先カレンダーのID | Calendar登録先 |
 
 Secretの値は、公開リポジトリのコードや`.env`へ直接書かないでください。GitHubは登録済みSecretの中身を後から表示できないため、別リポジトリから自動コピーもできません。
 
 Google Calendarを使うには、登録先カレンダーをサービスアカウントのメールアドレスへ「予定の変更」権限で共有しておきます。
+
+このリポジトリの所有者環境では、Googleの秘密鍵を増やさないため、ChatGPTのGoogle Calendar連携が`monitor-state`ブランチを1日2回読み、開始日だけを同期します。その構成では上のGoogle用Secret 2件は不要です。
+
+通知先が未設定でも監視自体は止まりません。DiscordはWebhook追加後に未通知案件を再送し、Calendar直接連携が未設定なら診断ログへ`calendar_deferred`を残します。
 
 ### 2. Repository variable
 

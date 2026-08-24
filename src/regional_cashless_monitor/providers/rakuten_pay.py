@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date
+from datetime import date, timedelta
 from urllib.parse import urlsplit
 
 from regional_cashless_monitor.models import Campaign, FetchDiagnostic
@@ -130,9 +130,14 @@ class RakutenPayProvider(CampaignProvider):
             if not target or not has_regional_benefit(title, description, leading_body):
                 continue
             start, end, period = extract_best_date_range(
-                detail_soup, listing_context, title, description
+                detail_soup, title, description, listing_context
             )
             if not start:
+                continue
+            reference_day = today or date.today()
+            if (end and end < reference_day) or (
+                end is None and start < reference_day - timedelta(days=180)
+            ):
                 continue
             campaigns.append(
                 Campaign(

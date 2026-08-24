@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import logging
 import re
+import ssl
 import time
 import urllib.error
 import urllib.request
@@ -164,17 +165,41 @@ class OfficialPageClient:
         }
 
     def get_text(self, url: str) -> str:
+        def download(context: ssl.SSLContext | None = None) -> tuple[bytes, int, str]:
+            request = urllib.request.Request(url, headers=self.headers, method="GET")
+            with urllib.request.urlopen(
+                request,
+                timeout=self.timeout_seconds,
+                context=context,
+            ) as response:
+                return (
+                    response.read(),
+                    int(getattr(response, "status", 200)),
+                    response.headers.get_content_charset() or "utf-8",
+                )
+
         last_error: Exception | None = None
         for attempt in range(3):
             try:
-                request = urllib.request.Request(url, headers=self.headers, method="GET")
-                with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                    content = response.read()
-                    status = int(getattr(response, "status", 200))
-                    charset = response.headers.get_content_charset() or "utf-8"
+                try:
+                    content, status, charset = download()
+                except urllib.error.URLError as exc:
+                    # d払い公式は2026年8月時点で古いTLS再ネゴシエーションを要求する。
+                    # 証明書・ホスト名検証は残し、その互換オプションだけを限定的に許可する。
+                    if "UNSAFE_LEGACY_RENEGOTIATION_DISABLED" not in str(exc):
+                        raise
+                    context = ssl.create_default_context()
+                    context.options |= getattr(ssl, "OP_LEGACY_SERVER_CONNECT", 0x4)
+                    content, status, charset = download(context)
                 if len(content) < 500:
+                    snippet = re.sub(
+                        r"\s+",
+                        " ",
+                        content.decode(charset, errors="replace")[:400],
+                    )
                     raise RuntimeError(
-                        f"本文が短すぎます: status={status}, bytes={len(content)}"
+                        f"本文が短すぎます: status={status}, bytes={len(content)}, "
+                        f"先頭={snippet!r}"
                     )
                 try:
                     return content.decode(charset)

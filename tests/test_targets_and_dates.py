@@ -40,3 +40,17 @@ def test_japanese_full_dates() -> None:
     )
     assert start == date(2026, 8, 7)
     assert end == date(2026, 8, 30)
+
+
+def test_unrelated_dates_do_not_become_a_fake_range() -> None:
+    start, end, _ = extract_date_range(
+        "2026年8月17日開始。関連記事は2026年7月7日に公開しました。"
+    )
+    assert start == date(2026, 8, 17)
+    assert end is None
+
+
+def test_japanese_kara_range() -> None:
+    start, end, _ = extract_date_range("2026年10月1日から10月31日まで")
+    assert start == date(2026, 10, 1)
+    assert end == date(2026, 10, 31)

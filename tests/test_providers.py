@@ -4,7 +4,7 @@ from regional_cashless_monitor.providers.au_pay import AuPayProvider, LIST_URLS
 from regional_cashless_monitor.providers.dpay import DPayProvider, LIST_URL as DPAY_LIST
 from regional_cashless_monitor.providers.paypay import PayPayProvider
 from regional_cashless_monitor.providers.rakuten_pay import (
-    API_URL as RAKUTEN_API,
+    DATA_URL as RAKUTEN_DATA,
     LIST_URL as RAKUTEN_LIST,
     RakutenPayProvider,
 )
@@ -26,7 +26,7 @@ def test_paypay_only_reads_point_campaign_and_exact_scope() -> None:
       <h2>各自治体のキャンペーン</h2>
       <h3>東北地方</h3><h4>岩手県</h4>
       <h5>ポイント還元キャンペーン</h5>
-      <div><a href="/event/support-local/iwate-pref/">岩手県 第3弾</a>
+      <div><a href="/event/iwate-pref-20260901/">岩手県 第3弾</a>
         開催予定 2026/9/1 〜 9/30</div>
       <div><a href="/event/support-local/tono/">遠野市 第2弾</a>
         開催予定 2026/10/1 〜 11/30</div>
@@ -46,9 +46,10 @@ def test_rakuten_detail_is_parsed() -> None:
     detail_url = "https://common-service.payment.rakuten.co.jp/campaigns/1001-ichinoseki/"
     pages = {
         RAKUTEN_LIST: "<html><body><h1>キャンペーン一覧</h1></body></html>",
-        RAKUTEN_API: (
+        RAKUTEN_DATA: (
             '{"campaigns":[{"title":"一関市で最大20％還元",'
-            f'"url":"{detail_url}"}}]}}'
+            f'"url":"{detail_url}"}},{{"title":"非公開",'
+            '"showForGuest":false,"url":"https://common-service.payment.rakuten.co.jp/campaigns/hidden/"}]}'
         ),
         detail_url: """
           <html><head>

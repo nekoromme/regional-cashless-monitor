@@ -63,6 +63,11 @@ class RakutenPayProvider(CampaignProvider):
                 if value not in endpoint_hints:
                     endpoint_hints.append(value)
             script_hints = []
+            html_data_hints = []
+            for node in soup.find_all():
+                for key, value in node.attrs.items():
+                    if key.startswith("data-") and value:
+                        html_data_hints.append(f"{node.name}.{key}={value}")
             for script_src in scripts:
                 if script_src == "inline" or "media" not in script_src.lower():
                     continue
@@ -72,14 +77,21 @@ class RakutenPayProvider(CampaignProvider):
                 except Exception as exc:
                     script_hints.append(f"{script_url}: {exc!r}")
                     continue
-                for line in javascript.splitlines():
-                    compact = re.sub(r"\s+", " ", line).strip()
-                    if any(word in compact.lower() for word in ("fetch(", "api", "json", "endpoint")):
-                        script_hints.append(f"{script_url}: {compact[:500]}")
+                values = []
+                for match in re.finditer(
+                    r"[\"'`](https?://[^\"'`]+|/[^\"'`]{2,240})[\"'`]",
+                    javascript,
+                ):
+                    value = match.group(1)
+                    lowered = value.lower()
+                    if any(word in lowered for word in ("api", "media", "content", "search", "json")):
+                        if value not in values:
+                            values.append(value)
+                script_hints.append(f"{script_url}: {values[-80:]}")
             raise RuntimeError(
                 "楽天ペイ一覧からキャンペーンURLを1件も取得できません。"
                 f" script={scripts[-20:]}, hints={endpoint_hints[-40:]}, "
-                f"script_hints={script_hints[-20:]}"
+                f"html_data={html_data_hints[-80:]}, script_hints={script_hints[-20:]}"
             )
 
         campaigns: list[Campaign] = []

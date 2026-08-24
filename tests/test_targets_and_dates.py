@@ -1,6 +1,9 @@
 from datetime import date
 
-from regional_cashless_monitor.providers.common import extract_date_range
+from regional_cashless_monitor.providers.common import (
+    extract_date_range,
+    has_regional_benefit,
+)
 from regional_cashless_monitor.targets import match_target
 
 
@@ -54,3 +57,11 @@ def test_japanese_kara_range() -> None:
     start, end, _ = extract_date_range("2026年10月1日から10月31日まで")
     assert start == date(2026, 10, 1)
     assert end == date(2026, 10, 31)
+
+
+def test_related_voucher_text_does_not_hide_a_point_campaign() -> None:
+    assert has_regional_benefit(
+        "岩手県で最大20％還元",
+        "関連記事: 一関市プレミアム商品券",
+    )
+    assert not has_regional_benefit("一関市プレミアム商品券を販売します")

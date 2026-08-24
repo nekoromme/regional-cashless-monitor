@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import re
 from datetime import date
-from urllib.parse import urljoin
+from urllib.parse import urlsplit
 
 from regional_cashless_monitor.models import Campaign, FetchDiagnostic
 from regional_cashless_monitor.providers.base import CampaignProvider
 from regional_cashless_monitor.providers.common import (
+    canonical_url,
     discover_links,
     element_text,
     extract_best_date_range,
@@ -20,6 +22,10 @@ from regional_cashless_monitor.providers.common import (
 from regional_cashless_monitor.targets import match_target
 
 LIST_URL = "https://common-service.payment.rakuten.co.jp/campaigns/"
+API_URL = (
+    "https://common-service.payment.rakuten.co.jp/api/common/campaign-list"
+    "?mediaKey=common-campaign-list"
+)
 OLD_DETAIL_PATH_RE = re.compile(r"^/campaign/20\d{2}/[^/]+/?$")
 NEW_DETAIL_PATH_RE = re.compile(r"^/campaigns/[^/?#]+/?$")
 
@@ -29,16 +35,83 @@ class RakutenPayProvider(CampaignProvider):
     provider_label = "楽天ペイ"
     list_urls = (LIST_URL,)
 
+    @staticmethod
+    def _links_from_api(payload: object) -> list[tuple[str, str]]:
+        """公開JSONを再帰的に読み、詳細URLと同じカード内の文言を組にする。"""
+
+        found: dict[str, str] = {}
+
+        def walk(value: object, inherited: tuple[str, ...] = ()) -> None:
+            if isinstance(value, dict):
+                local = tuple(
+                    str(item)
+                    for item in value.values()
+                    if isinstance(item, (str, int, float))
+                )
+                context_parts = (inherited + local)[-30:]
+                context = " ".join(context_parts)[:5000]
+                for item in local:
+                    if not (item.startswith(("http://", "https://", "/"))):
+                        continue
+                    url = canonical_url(LIST_URL, item)
+                    parts = urlsplit(url)
+                    is_new = (
+                        parts.netloc == "common-service.payment.rakuten.co.jp"
+                        and NEW_DETAIL_PATH_RE.match(parts.path)
+                    )
+                    is_old = (
+                        parts.netloc == "pay.rakuten.co.jp"
+                        and OLD_DETAIL_PATH_RE.match(parts.path)
+                    )
+                    if is_new or is_old:
+                        found.setdefault(url, context)
+                for child in value.values():
+                    if isinstance(child, (dict, list)):
+                        walk(child, context_parts)
+            elif isinstance(value, list):
+                for child in value:
+                    walk(child, inherited)
+
+        walk(payload)
+        return list(found.items())
+
     def fetch_campaigns(self, *, today: date | None = None):
+        # 旧URLはmeta refreshだけになった。現在の公式一覧が使う公開JSONを直接読む。
         raw_html = self.client.get_text(LIST_URL)
-        links = discover_links(
+        api_raw = self.client.get_text(API_URL)
+        try:
+            payload = json.loads(api_raw)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"楽天ペイ公式キャンペーンJSONを解釈できません: {exc}") from exc
+
+        links = self._links_from_api(payload)
+        # API形式変更時にURL文字列だけは拾える可能性があるため、JSON文字列も補助探索する。
+        embedded_new = discover_links(
+            api_raw,
+            base_url=LIST_URL,
+            allowed_host="common-service.payment.rakuten.co.jp",
+            path_pattern=NEW_DETAIL_PATH_RE,
+            limit=100,
+        )
+        embedded_old = discover_links(
+            api_raw,
+            base_url=LIST_URL,
+            allowed_host="pay.rakuten.co.jp",
+            path_pattern=OLD_DETAIL_PATH_RE,
+            limit=100,
+        )
+        known = {url for url, _ in links}
+        links.extend(item for item in embedded_new + embedded_old if item[0] not in known)
+
+        # HTML直書きへ戻った場合にも対応する。
+        page_new = discover_links(
             raw_html,
             base_url=LIST_URL,
             allowed_host="common-service.payment.rakuten.co.jp",
             path_pattern=NEW_DETAIL_PATH_RE,
             limit=100,
         )
-        old_links = discover_links(
+        page_old = discover_links(
             raw_html,
             base_url=LIST_URL,
             allowed_host="pay.rakuten.co.jp",
@@ -46,52 +119,11 @@ class RakutenPayProvider(CampaignProvider):
             limit=100,
         )
         known = {url for url, _ in links}
-        links.extend(item for item in old_links if item[0] not in known)
+        links.extend(item for item in page_new + page_old if item[0] not in known)
         if not links:
-            soup = soup_from_html(raw_html)
-            scripts = [
-                str(script.get("src") or "inline")
-                for script in soup.find_all("script")
-            ]
-            endpoint_hints = []
-            for match in re.finditer(
-                r"(?:https?:)?//[^\"'<>\s]+|/[A-Za-z0-9_./?=&%-]*(?:api|campaign|media)[A-Za-z0-9_./?=&%-]*",
-                raw_html,
-                flags=re.IGNORECASE,
-            ):
-                value = match.group(0).rstrip("\\,;)")
-                if value not in endpoint_hints:
-                    endpoint_hints.append(value)
-            script_hints = []
-            html_data_hints = []
-            for node in soup.find_all():
-                for key, value in node.attrs.items():
-                    if key.startswith("data-") and value:
-                        html_data_hints.append(f"{node.name}.{key}={value}")
-            for script_src in scripts:
-                if script_src == "inline" or "media" not in script_src.lower():
-                    continue
-                script_url = urljoin(LIST_URL, script_src)
-                try:
-                    javascript = self.client.get_text(script_url)
-                except Exception as exc:
-                    script_hints.append(f"{script_url}: {exc!r}")
-                    continue
-                values = []
-                for match in re.finditer(
-                    r"[\"'`](https?://[^\"'`]+|/[^\"'`]{2,240})[\"'`]",
-                    javascript,
-                ):
-                    value = match.group(1)
-                    lowered = value.lower()
-                    if any(word in lowered for word in ("api", "media", "content", "search", "json")):
-                        if value not in values:
-                            values.append(value)
-                script_hints.append(f"{script_url}: {values[-80:]}")
             raise RuntimeError(
-                "楽天ペイ一覧からキャンペーンURLを1件も取得できません。"
-                f" script={scripts[-20:]}, hints={endpoint_hints[-40:]}, "
-                f"html_data={html_data_hints[-80:]}, script_hints={script_hints[-20:]}"
+                "楽天ペイ公式JSONからキャンペーンURLを1件も取得できません。"
+                f" JSON先頭={api_raw[:1000]!r}"
             )
 
         campaigns: list[Campaign] = []
@@ -135,7 +167,7 @@ class RakutenPayProvider(CampaignProvider):
 
         diagnostic = FetchDiagnostic(
             provider=self.provider,
-            url=LIST_URL,
+            url=API_URL,
             ok=True,
             discovered_links=len(links),
             parsed_campaigns=len(campaigns),

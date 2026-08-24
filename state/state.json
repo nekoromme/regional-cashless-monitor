@@ -1,7 +1,261 @@
 {
-  "armed": false,
-  "baseline_at": null,
-  "campaigns": {},
-  "source_health": {},
+  "armed": true,
+  "baseline_at": "2026-08-24T18:56:01.161785+09:00",
+  "campaigns": {
+    "02263e647f59378f64fee0bd78110480706ff812700d580f2ceba5f111326481": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "859a31b70ee51b8651bf2dcc302b207fa9f09d14c155b6716efa407ddce9bd69",
+      "end_date": "2026-07-07",
+      "fingerprint": "859a31b70ee51b8651bf2dcc302b207fa9f09d14c155b6716efa407ddce9bd69",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "859a31b70ee51b8651bf2dcc302b207fa9f09d14c155b6716efa407ddce9bd69",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2026年8月7日~) 【2026年9月】au PAYのおトクなキャンペーンまとめ 【2026年8月】au PAYのおトクなキャンペーンまとめ au PAYが使える飲食店はこちら!加盟店でおトクに食事を楽しもう 住民税を払い忘れたらどうなる?ペナルティと今すぐできる対処法 ガソリンスタンドの支払いもQRコード決済で! 利用手順やメリットを解説 【2026年8月】au PAYのおトクなキャンペーンまとめ 【2026年7月】au PAYのおトクなキャンペーンまとめ au PAY、Amazon.co.jpでau PAYを使うと最大30%のau PAY 残高を還元(2026年7月7日~) 住民税を払い忘れたらどうなる?ペナルティと今すぐできる",
+      "provider": "au_pay",
+      "provider_label": "au PAY",
+      "reward_text": "最大10％還元",
+      "source_url": "https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3",
+      "start_date": "2026-08-07",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_mkrs64fq8i",
+        "kind": "prefecture",
+        "label": "千葉県"
+      },
+      "title": "【自治体キャンペーン】千葉県の対象店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2026年8月7日~)",
+      "url": "https://media.aupay.wallet.auone.jp/articles/5170/"
+    },
+    "4d4ec66cd9bbfdcce28deccb620090459fe7f79c946c606389e44997ab26cbb2": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "a1fc82ecf21d009e11c188712e31a5d3f2eaa478d0052f811d04df2d0aed5e62",
+      "end_date": "2026-07-07",
+      "fingerprint": "a1fc82ecf21d009e11c188712e31a5d3f2eaa478d0052f811d04df2d0aed5e62",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "a1fc82ecf21d009e11c188712e31a5d3f2eaa478d0052f811d04df2d0aed5e62",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2026年8月7日~) 【2026年9月】au PAYのおトクなキャンペーンまとめ 【2026年8月】au PAYのおトクなキャンペーンまとめ au PAYが使える飲食店はこちら!加盟店でおトクに食事を楽しもう 住民税を払い忘れたらどうなる?ペナルティと今すぐできる対処法 ガソリンスタンドの支払いもQRコード決済で! 利用手順やメリットを解説 【2026年8月】au PAYのおトクなキャンペーンまとめ 【2026年7月】au PAYのおトクなキャンペーンまとめ au PAY、Amazon.co.jpでau PAYを使うと最大30%のau PAY 残高を還元(2026年7月7日~) 住民税を払い忘れたらどうなる?ペナルティと今すぐできる",
+      "provider": "au_pay",
+      "provider_label": "au PAY",
+      "reward_text": "最大10％還元",
+      "source_url": "https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3",
+      "start_date": "2026-08-07",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_mkrs64fq8i",
+        "kind": "prefecture",
+        "label": "千葉県"
+      },
+      "title": "【自治体キャンペーン】千葉県の対象店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2025年8月1日~)",
+      "url": "https://media.aupay.wallet.auone.jp/articles/4356/"
+    },
+    "57a9b88119c01b46f8182ab3ab4f93016d6a8c3fed0a5e5cf3ca5a2718abe5ff": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "6359c6176e946e643445809acf9966f72bde24e0f4fbf041268a7c09a9688f6f",
+      "end_date": "2026-08-30",
+      "fingerprint": "6359c6176e946e643445809acf9966f72bde24e0f4fbf041268a7c09a9688f6f",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "6359c6176e946e643445809acf9966f72bde24e0f4fbf041268a7c09a9688f6f",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "千葉県 第3弾 開催中 2026/8/7 〜 8/27 終了日が2026.8.30から短縮になりました。",
+      "provider": "paypay",
+      "provider_label": "PayPay",
+      "reward_text": null,
+      "source_url": "https://paypay.ne.jp/event/support-local/",
+      "start_date": "2026-08-07",
+      "status_text": "開催中",
+      "target": {
+        "key": "prefecture_mkrs64fq8i",
+        "kind": "prefecture",
+        "label": "千葉県"
+      },
+      "title": "千葉県 第3弾",
+      "url": "https://paypay.ne.jp/event/chiba-pref-20260807/"
+    },
+    "9ab5147b1c6b63e8b0bba194d8c5b13908503ba2a09dbe63708ffb18e695b05e": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "54d5d0207e1ca99cefc259c1899703685a84d0d73b15abc516e3be77bd489b2e",
+      "end_date": "2026-08-30",
+      "fingerprint": "54d5d0207e1ca99cefc259c1899703685a84d0d73b15abc516e3be77bd489b2e",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "54d5d0207e1ca99cefc259c1899703685a84d0d73b15abc516e3be77bd489b2e",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "〈キャンペーン期間〉 2026/8/7(金)0:00~8/30(日)23:59 使うたび、めぐるたび、千葉の楽しさが広がっ",
+      "provider": "rakuten_pay",
+      "provider_label": "楽天ペイ",
+      "reward_text": "最大10％還元",
+      "source_url": "https://common-service.payment.rakuten.co.jp/campaigns/",
+      "start_date": "2026-08-07",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_mkrs64fq8i",
+        "kind": "prefecture",
+        "label": "千葉県"
+      },
+      "title": "使うたび、めぐるたび、千葉の楽しさが広がっていく! 楽天ペイのコード・QR払いで楽天ポイント最大10%還元[千葉県キャッシュレス決済キャンペーン]",
+      "url": "https://pay.rakuten.co.jp/campaign/2026/0807-chiba/"
+    },
+    "ab7f8cc7873681b4bcd7c7757398c57e63567b28858105626fca0fe8c5e12a0b": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "6d4a2abcbb6952a211dfc157714e55ee4cac5555ac4058d0b8f52f70ef2eaa52",
+      "end_date": null,
+      "fingerprint": "6d4a2abcbb6952a211dfc157714e55ee4cac5555ac4058d0b8f52f70ef2eaa52",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "6d4a2abcbb6952a211dfc157714e55ee4cac5555ac4058d0b8f52f70ef2eaa52",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "神奈川県 開催中 2026/6/19 〜 予算上限に達し次第終了。早期終了の可能性があります。",
+      "provider": "paypay",
+      "provider_label": "PayPay",
+      "reward_text": null,
+      "source_url": "https://paypay.ne.jp/event/support-local/",
+      "start_date": "2026-06-19",
+      "status_text": "開催中",
+      "target": {
+        "key": "prefecture_ntso0iv60a29b",
+        "kind": "prefecture",
+        "label": "神奈川県"
+      },
+      "title": "神奈川県",
+      "url": "https://paypay.ne.jp/event/kanagawa-pref/"
+    },
+    "d853572cbf22a372532df4c2ae89998e3344cdc5fbbf27aeb9ede479339a5a2b": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "cd51576ccc9397ccc13720539b141cc85dd22e951ed75da04242cbce0e48ee07",
+      "end_date": "2026-09-18",
+      "fingerprint": "cd51576ccc9397ccc13720539b141cc85dd22e951ed75da04242cbce0e48ee07",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "cd51576ccc9397ccc13720539b141cc85dd22e951ed75da04242cbce0e48ee07",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "岩手県 第3弾 開催中 2026/8/17 〜 8/25 終了日が2026.9.18から短縮になりました。",
+      "provider": "paypay",
+      "provider_label": "PayPay",
+      "reward_text": null,
+      "source_url": "https://paypay.ne.jp/event/support-local/",
+      "start_date": "2026-08-17",
+      "status_text": "開催中",
+      "target": {
+        "key": "prefecture_djty4kopu",
+        "kind": "prefecture",
+        "label": "岩手県"
+      },
+      "title": "岩手県 第3弾",
+      "url": "https://paypay.ne.jp/event/iwate-pref-20260817/"
+    },
+    "e0540b6ba6934e3becb2785be1e9f5874c3d4959351f0aa99635e57c0f5f68e8": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "4284d1c5c889a8efb1199a4940a1c27e20eb6f57577db34045bae9dde2325c29",
+      "end_date": "2026-07-07",
+      "fingerprint": "4284d1c5c889a8efb1199a4940a1c27e20eb6f57577db34045bae9dde2325c29",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "4284d1c5c889a8efb1199a4940a1c27e20eb6f57577db34045bae9dde2325c29",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2026年8月7日~) 【2026年9月】au PAYのおトクなキャンペーンまとめ 【2026年8月】au PAYのおトクなキャンペーンまとめ au PAYが使える飲食店はこちら!加盟店でおトクに食事を楽しもう 住民税を払い忘れたらどうなる?ペナルティと今すぐできる対処法 ガソリンスタンドの支払いもQRコード決済で! 利用手順やメリットを解説 【2026年8月】au PAYのおトクなキャンペーンまとめ 【2026年7月】au PAYのおトクなキャンペーンまとめ au PAY、Amazon.co.jpでau PAYを使うと最大30%のau PAY 残高を還元(2026年7月7日~) 住民税を払い忘れたらどうなる?ペナルティと今すぐできる",
+      "provider": "au_pay",
+      "provider_label": "au PAY",
+      "reward_text": "最大20％還元",
+      "source_url": "https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3",
+      "start_date": "2026-08-07",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_djty4kopu",
+        "kind": "prefecture",
+        "label": "岩手県"
+      },
+      "title": "【自治体キャンペーン】岩手県の対象店舗でau PAYを使うとお支払いの最大20%が戻ってくる(2026年8月17日~)",
+      "url": "https://media.aupay.wallet.auone.jp/articles/5195/"
+    },
+    "f3d190d79d89f49e56e5fc61da6ca18c7ef3b16ad760351801434e8e72a64f93": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "777d7ef7235620e1b471de05560806f805cd79994b81f7da31d46404538435ea",
+      "end_date": "2026-07-07",
+      "fingerprint": "777d7ef7235620e1b471de05560806f805cd79994b81f7da31d46404538435ea",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "777d7ef7235620e1b471de05560806f805cd79994b81f7da31d46404538435ea",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "店舗でau PAYを使うとお支払いの最大10%が戻ってくる(2026年8月7日~) 【2026年9月】au PAYのおトクなキャンペーンまとめ 【2026年8月】au PAYのおトクなキャンペーンまとめ au PAYが使える飲食店はこちら!加盟店でおトクに食事を楽しもう 住民税を払い忘れたらどうなる?ペナルティと今すぐできる対処法 ガソリンスタンドの支払いもQRコード決済で! 利用手順やメリットを解説 【2026年8月】au PAYのおトクなキャンペーンまとめ 【2026年7月】au PAYのおトクなキャンペーンまとめ au PAY、Amazon.co.jpでau PAYを使うと最大30%のau PAY 残高を還元(2026年7月7日~) 住民税を払い忘れたらどうなる?ペナルティと今すぐできる",
+      "provider": "au_pay",
+      "provider_label": "au PAY",
+      "reward_text": "最大20％還元",
+      "source_url": "https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3",
+      "start_date": "2026-08-07",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_ntso0iv60a29b",
+        "kind": "prefecture",
+        "label": "神奈川県"
+      },
+      "title": "【自治体キャンペーン】神奈川県内の対象店舗でau PAYを使うとお支払いの最大20%が戻ってくる(2026年6月19日~)",
+      "url": "https://media.aupay.wallet.auone.jp/articles/5060/"
+    },
+    "f41fabc05ff53f09e90e2cf296704f7df29e8aba81560f383985aa72183142e0": {
+      "calendar_event_id": null,
+      "calendar_fingerprint": "ca86b7736126069cd45a60e601dda7e2375de3a0f015ec8e118c82f3b489f732",
+      "end_date": "2026-06-19",
+      "fingerprint": "ca86b7736126069cd45a60e601dda7e2375de3a0f015ec8e118c82f3b489f732",
+      "first_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "last_notified_fingerprint": "ca86b7736126069cd45a60e601dda7e2375de3a0f015ec8e118c82f3b489f732",
+      "last_seen_at": "2026-08-24T18:56:01.161785+09:00",
+      "notified": true,
+      "period_text": "00ポイント(通常ポイント) 詳細> 〈キャンペーン期間〉 2026/6/19(金)0:00~予算上限に達するまで 本キャンペーンは早期に終了することがあります。 楽天ペイのコード・QR払い、セルフ払いが対象です。楽天ペイアプリ内の請求書払い、楽天ポイントカード、楽天Edy、Suica、楽天カードタッチ決済、ネットでの楽天ペイによるお支払いは対象外です。 特典ポイント進呈予定日は2026年11月末日までです。 ポイントの還元率は中小企業及び小規模企業で最大20%、大手企業で最大10%が適用されます。 キャンペーン対象店舗と還元率の確認方法 をご確認ください。 タバコの購入やタクシー等の移動販売における決済は還元対象外です。 そのほかポイント還元の対象外の商品は 神奈川県特設ページ をご確認ください。 地図で確認 対象店舗は地図上に こちらのピンが立ちます。 地図で近くのお店を探す 一部地図に掲載されていないキャンペーン対象店舗があります。実施状況については店頭のポスターをご確認ください。 実施しているキャンペーンについては店舗詳細をご確認ください。 店頭で確認 こちらのポスターを掲出している 楽天ペイを使えるお店が対象です。 一部地図に掲載されていないキャンペーン対象店舗があります。実施状況については店頭のポスターをご確認ください。 実施しているキャンペーンについては店舗詳細をご確認ください。 コード表示のお店では 店員の方に「コード・QR払い」画面の バーコードを 読み取ってもらってください。 QR読み取りのお店では 「QR読み取り」画面で 店員の方が提示するQRコードを 読み取ってください。 QRコードは(株)デンソーウェーブの登録商標です。 最大1.5%還元の詳細はこちら 最大1.5%還元には、一部対象外の店舗およびお支払い方法があります。 はじめての方 もれなくポイントゲット だれでもダブルで貯まる アプリひとつでかんたん♪ 条件達成にはカウント期間中にポイントカードを2回以上提示する必要があります。詳細は 楽天ポイント最大2.5%還元プログラム をご確認ください。 楽天ポイントカードのご提示と楽天ペイのコード・QR払いが利用可能な店舗(ダブルで貯まる対象店舗)における最大還元率です。詳細は、 ダブルで貯まる対象店舗 からご確認ください。 いますぐ楽天ペイアプリを ダウンロードしよう キャンペーンに参加するにはダウンロードが必須です。 キャンペーン詳細 【楽天ペイ】かながわトクトクキャンペーン!「かなトク!」 キャンペーン名 【楽天ペイ】かながわトクトクキャンペーン!「かなトク!」 キャンペーン 期間 2026年6月19日(金)0:00~予算上限に達するまで 特典 【中小企業および",
+      "provider": "rakuten_pay",
+      "provider_label": "楽天ペイ",
+      "reward_text": "最大20％還元",
+      "source_url": "https://common-service.payment.rakuten.co.jp/campaigns/",
+      "start_date": "2026-06-19",
+      "status_text": null,
+      "target": {
+        "key": "prefecture_ntso0iv60a29b",
+        "kind": "prefecture",
+        "label": "神奈川県"
+      },
+      "title": "かながわトクトクキャンペーンかなトク! 楽天ペイのコード・QR払いで楽天ポイント最大20%還元",
+      "url": "https://pay.rakuten.co.jp/campaign/2026/0619-kanagawa/"
+    }
+  },
+  "source_health": {
+    "au_pay|https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    },
+    "au_pay|https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3&page=2": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    },
+    "au_pay|https://media.aupay.wallet.auone.jp/articles/search?q%5Btitle_cont%5D=%E8%87%AA%E6%B2%BB%E4%BD%93%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%9A%E3%83%BC%E3%83%B3&page=3": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    },
+    "dpay|https://service.smt.docomo.ne.jp/keitai_payment/campaign/dpay_ouen/": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    },
+    "paypay|https://paypay.ne.jp/event/support-local/": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    },
+    "rakuten_pay|https://common-service.payment.rakuten.co.jp/ptcms/campaign-medias/common-campaign-list.json": {
+      "alert_sent": false,
+      "consecutive_failures": 0,
+      "last_error": null,
+      "last_success_at": "2026-08-24T18:56:01.161785+09:00"
+    }
+  },
   "version": 1
 }

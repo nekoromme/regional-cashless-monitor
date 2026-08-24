@@ -283,6 +283,9 @@ def run_monitor(
         if summary.errors:
             audit.write("baseline_aborted", errors=summary.errors)
             return summary
+        # baselineは取得できた現在の一覧を正として作り直す。解析修正後に
+        # 過去の誤検出が状態ファイルへ残り続けるのを防ぐ。
+        state["campaigns"] = {}
         for campaign in campaigns:
             record = state["campaigns"].setdefault(
                 campaign.campaign_id, campaign.as_state_record(now)

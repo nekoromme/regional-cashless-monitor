@@ -57,12 +57,22 @@ class FakeNotifier:
 
 
 class FakeCalendar:
+    enabled = True
+
     def __init__(self):
         self.calls = []
 
     def upsert_campaign(self, campaign):
         self.calls.append(campaign)
         return "event-id"
+
+
+class DisabledNotifier(FakeNotifier):
+    enabled = False
+
+
+class DisabledCalendar(FakeCalendar):
+    enabled = False
 
 
 def run_once(tmp_path: Path, *, mode: str, state: dict, campaign: Campaign, notifier, calendar):
@@ -168,3 +178,24 @@ def test_expired_campaign_is_suppressed(tmp_path: Path) -> None:
     assert summary.expired_suppressed == 1
     assert notifier.campaign_calls == []
     assert calendar.calls == []
+
+
+def test_missing_destinations_defer_without_failing_monitor(tmp_path: Path) -> None:
+    state = deepcopy(EMPTY_STATE)
+    state["armed"] = True
+    notifier = DisabledNotifier()
+    calendar = DisabledCalendar()
+    summary = run_once(
+        tmp_path,
+        mode="run",
+        state=state,
+        campaign=make_campaign(),
+        notifier=notifier,
+        calendar=calendar,
+    )
+    record = next(iter(state["campaigns"].values()))
+    assert summary.errors == []
+    assert summary.discord_notifications == 0
+    assert summary.calendar_updates == 0
+    assert record["notified"] is False
+    assert record.get("calendar_fingerprint") is None

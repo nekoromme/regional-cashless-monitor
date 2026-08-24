@@ -18,8 +18,9 @@ from regional_cashless_monitor.providers.common import (
 )
 from regional_cashless_monitor.targets import match_target
 
-LIST_URL = "https://pay.rakuten.co.jp/campaign/"
-DETAIL_PATH_RE = re.compile(r"^/campaign/20\d{2}/[^/]+/?$")
+LIST_URL = "https://common-service.payment.rakuten.co.jp/campaigns/"
+OLD_DETAIL_PATH_RE = re.compile(r"^/campaign/20\d{2}/[^/]+/?$")
+NEW_DETAIL_PATH_RE = re.compile(r"^/campaigns/[^/?#]+/?$")
 
 
 class RakutenPayProvider(CampaignProvider):
@@ -32,12 +33,29 @@ class RakutenPayProvider(CampaignProvider):
         links = discover_links(
             raw_html,
             base_url=LIST_URL,
-            allowed_host="pay.rakuten.co.jp",
-            path_pattern=DETAIL_PATH_RE,
+            allowed_host="common-service.payment.rakuten.co.jp",
+            path_pattern=NEW_DETAIL_PATH_RE,
             limit=100,
         )
+        old_links = discover_links(
+            raw_html,
+            base_url=LIST_URL,
+            allowed_host="pay.rakuten.co.jp",
+            path_pattern=OLD_DETAIL_PATH_RE,
+            limit=100,
+        )
+        known = {url for url, _ in links}
+        links.extend(item for item in old_links if item[0] not in known)
         if not links:
-            raise RuntimeError("楽天ペイ一覧からキャンペーンURLを1件も取得できません")
+            soup = soup_from_html(raw_html)
+            scripts = [
+                str(script.get("src") or "inline")
+                for script in soup.find_all("script")
+            ]
+            raise RuntimeError(
+                "楽天ペイ一覧からキャンペーンURLを1件も取得できません。"
+                f" script={scripts[-20:]}"
+            )
 
         campaigns: list[Campaign] = []
         for url, listing_context in links:

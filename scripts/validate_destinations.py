@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import urllib.request
@@ -53,5 +54,13 @@ def validate_calendar() -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="通知先Secretを投稿なしで検証")
+    parser.add_argument(
+        "--discord-only",
+        action="store_true",
+        help="Discordだけを検証し、Google Calendarは接続済み同期へ任せる",
+    )
+    args = parser.parse_args()
     validate_discord()
-    validate_calendar()
+    if not args.discord_only:
+        validate_calendar()

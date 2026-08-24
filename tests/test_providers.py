@@ -4,6 +4,7 @@ from regional_cashless_monitor.providers.au_pay import AuPayProvider, LIST_URLS
 from regional_cashless_monitor.providers.dpay import DPayProvider, LIST_URL as DPAY_LIST
 from regional_cashless_monitor.providers.paypay import PayPayProvider
 from regional_cashless_monitor.providers.rakuten_pay import (
+    API_URL as RAKUTEN_API,
     LIST_URL as RAKUTEN_LIST,
     RakutenPayProvider,
 )
@@ -44,9 +45,11 @@ def test_paypay_only_reads_point_campaign_and_exact_scope() -> None:
 def test_rakuten_detail_is_parsed() -> None:
     detail_url = "https://common-service.payment.rakuten.co.jp/campaigns/1001-ichinoseki/"
     pages = {
-        RAKUTEN_LIST: f"""
-          <html><body><a href="{detail_url}">詳細はこちら</a></body></html>
-        """,
+        RAKUTEN_LIST: "<html><body><h1>キャンペーン一覧</h1></body></html>",
+        RAKUTEN_API: (
+            '{"campaigns":[{"title":"一関市で最大20％還元",'
+            f'"url":"{detail_url}"}}]}}'
+        ),
         detail_url: """
           <html><head>
             <meta name="description" content="岩手県一関市の対象店舗で楽天ペイを使うと最大20％還元。2026年10月1日から10月31日まで。">

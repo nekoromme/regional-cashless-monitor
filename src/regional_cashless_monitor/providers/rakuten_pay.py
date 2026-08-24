@@ -26,6 +26,10 @@ API_URL = (
     "https://common-service.payment.rakuten.co.jp/api/common/campaign-list"
     "?mediaKey=common-campaign-list"
 )
+GRID_SCRIPT_URL = (
+    "https://common-service.payment.rakuten.co.jp/static/common/fragments/medias/"
+    "medias-grid.js"
+)
 OLD_DETAIL_PATH_RE = re.compile(r"^/campaign/20\d{2}/[^/]+/?$")
 NEW_DETAIL_PATH_RE = re.compile(r"^/campaigns/[^/?#]+/?$")
 
@@ -78,7 +82,18 @@ class RakutenPayProvider(CampaignProvider):
     def fetch_campaigns(self, *, today: date | None = None):
         # 旧URLはmeta refreshだけになった。現在の公式一覧が使う公開JSONを直接読む。
         raw_html = self.client.get_text(LIST_URL)
-        api_raw = self.client.get_text(API_URL)
+        try:
+            api_raw = self.client.get_text(API_URL)
+        except Exception as api_error:
+            javascript = self.client.get_text(GRID_SCRIPT_URL)
+            marker = "/api/common/campaign-list"
+            position = javascript.find(marker)
+            start = max(0, position - 1800)
+            end = min(len(javascript), position + 2500)
+            raise RuntimeError(
+                f"楽天ペイ公式JSONの取得に失敗: {api_error!r}; "
+                f"取得処理周辺={javascript[start:end]!r}"
+            ) from api_error
         try:
             payload = json.loads(api_raw)
         except json.JSONDecodeError as exc:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import date
+from urllib.parse import urljoin
 
 from regional_cashless_monitor.models import Campaign, FetchDiagnostic
 from regional_cashless_monitor.providers.base import CampaignProvider
@@ -52,9 +53,33 @@ class RakutenPayProvider(CampaignProvider):
                 str(script.get("src") or "inline")
                 for script in soup.find_all("script")
             ]
+            endpoint_hints = []
+            for match in re.finditer(
+                r"(?:https?:)?//[^\"'<>\s]+|/[A-Za-z0-9_./?=&%-]*(?:api|campaign|media)[A-Za-z0-9_./?=&%-]*",
+                raw_html,
+                flags=re.IGNORECASE,
+            ):
+                value = match.group(0).rstrip("\\,;)")
+                if value not in endpoint_hints:
+                    endpoint_hints.append(value)
+            script_hints = []
+            for script_src in scripts:
+                if script_src == "inline" or "media" not in script_src.lower():
+                    continue
+                script_url = urljoin(LIST_URL, script_src)
+                try:
+                    javascript = self.client.get_text(script_url)
+                except Exception as exc:
+                    script_hints.append(f"{script_url}: {exc!r}")
+                    continue
+                for line in javascript.splitlines():
+                    compact = re.sub(r"\s+", " ", line).strip()
+                    if any(word in compact.lower() for word in ("fetch(", "api", "json", "endpoint")):
+                        script_hints.append(f"{script_url}: {compact[:500]}")
             raise RuntimeError(
                 "楽天ペイ一覧からキャンペーンURLを1件も取得できません。"
-                f" script={scripts[-20:]}"
+                f" script={scripts[-20:]}, hints={endpoint_hints[-40:]}, "
+                f"script_hints={script_hints[-20:]}"
             )
 
         campaigns: list[Campaign] = []

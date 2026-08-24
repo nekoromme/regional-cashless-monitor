@@ -97,6 +97,8 @@ Google Calendarを使うには、登録先カレンダーをサービスアカ�
 
 所有者環境の定期実行と状態保存は`nekoromme/tcg-box-monitor-public`側で行います。このリポジトリのWorkflowは、二重取得を避けるため手動実行だけにしています。
 
+中継Workflowは毎回、既存Discord Webhookへの読み取り確認とGoogle Calendarの参照確認を先に行います。試験メッセージや試験予定を作らず、Secretの失効・権限不足だけを検出します。失敗時の公開ログにはWebhook URLや認証JSONを出しません。
+
 ## 手動実行モード
 
 | モード | 用途 |

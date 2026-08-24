@@ -42,7 +42,7 @@ def test_paypay_only_reads_point_campaign_and_exact_scope() -> None:
 
 
 def test_rakuten_detail_is_parsed() -> None:
-    detail_url = "https://pay.rakuten.co.jp/campaign/2026/1001-ichinoseki/"
+    detail_url = "https://common-service.payment.rakuten.co.jp/campaigns/1001-ichinoseki/"
     pages = {
         RAKUTEN_LIST: f"""
           <html><body><a href="{detail_url}">詳細はこちら</a></body></html>

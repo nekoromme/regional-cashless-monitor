@@ -1,6 +1,6 @@
 # 地域キャッシュレス還元モニター
 
-PayPay、楽天ペイ、d払い、au PAYの**公式キャンペーンページ**を、日本時間の毎日9:17・18:17に確認するGitHub Actions用モニターです。実運用では、既存のDiscord・Google Calendar用Secretを公開せず再利用するため、`nekoromme/tcg-box-monitor-public`の中継Workflowがこの公開コードを取得して実行します。
+PayPay、楽天ペイ、d払い、au PAYの**公式キャンペーンページ**を、日本時間の毎日9:17・18:17に確認するGitHub Actions用モニターです。実運用では、既存のDiscord用Secretを公開せず再利用するため、`nekoromme/tcg-box-monitor-public`の中継Workflowがこの公開コードを取得して実行します。
 
 指定地域の還元キャンペーンが新しく掲載されたらDiscordへ通知し、Google Calendarには**開始日の1日だけ**予定を入れます。キャンペーン期間全体を予定で埋めません。
 
@@ -75,7 +75,7 @@ Secretの値は、公開リポジトリのコードや`.env`へ直接書かな�
 
 Google Calendarを使うには、登録先カレンダーをサービスアカウントのメールアドレスへ「予定の変更」権限で共有しておきます。
 
-このリポジトリの所有者環境では、中継Workflowが既存のGoogle用Secret 2件も再利用します。
+このリポジトリの所有者環境では、Googleサービスアカウントの権限切れに影響されないよう、接続済みのGoogle Calendar同期が中継側の`regional-cashless-state`ブランチを9:35・18:35に読み、開始日だけを同期します。上のGoogle用Secret 2件は使いません。
 
 通知先が未設定でも監視自体は止まりません。DiscordはWebhook追加後に未通知案件を再送し、Calendar直接連携が未設定なら診断ログへ`calendar_deferred`を残します。
 
@@ -97,7 +97,7 @@ Google Calendarを使うには、登録先カレンダーをサービスアカ�
 
 所有者環境の定期実行と状態保存は`nekoromme/tcg-box-monitor-public`側で行います。このリポジトリのWorkflowは、二重取得を避けるため手動実行だけにしています。
 
-中継Workflowは毎回、既存Discord Webhookへの読み取り確認とGoogle Calendarの参照確認を先に行います。試験メッセージや試験予定を作らず、Secretの失効・権限不足だけを検出します。失敗時の公開ログにはWebhook URLや認証JSONを出しません。
+中継Workflowは毎回、既存Discord Webhookへの読み取り確認を先に行います。試験メッセージを作らず、Secretの失効だけを検出します。失敗時の公開ログにはWebhook URLを出しません。
 
 ## 手動実行モード
 

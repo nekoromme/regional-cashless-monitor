@@ -21,7 +21,9 @@ from regional_cashless_monitor.providers.common import (
 from regional_cashless_monitor.targets import match_target, normalize_text
 
 LIST_URL = "https://paypay.ne.jp/event/support-local/"
-DETAIL_PATH_RE = re.compile(r"^/event/support-local/[^/]+/?$")
+# 詳細ページは /event/{campaign-slug}/。過去には support-local 配下の
+# URLもあったため、両方を受け入れる。
+DETAIL_PATH_RE = re.compile(r"^/event/(?!support-local/?$)(?:support-local/)?[^/]+/?$")
 
 
 class PayPayProvider(CampaignProvider):

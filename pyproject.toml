@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "regional-cashless-monitor"
+version = "1.0.0"
+description = "Monitor official regional cashback campaigns for four Japanese mobile payment services"
+requires-python = ">=3.11"
+dependencies = [
+  "google-api-python-client>=2.140,<3",
+  "google-auth>=2.30,<3",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.2,<9",
+]
+
+[project.scripts]
+cashless-monitor = "regional_cashless_monitor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+logs/
+monitor-summary.json
+.env
+.monitor-state/

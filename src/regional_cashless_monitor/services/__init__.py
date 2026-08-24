@@ -1,0 +1,1 @@
+"""DiscordとGoogle Calendarへの出力。"""

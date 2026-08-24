@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import date
+from datetime import date, timedelta
 
 from regional_cashless_monitor.models import Campaign, FetchDiagnostic
 from regional_cashless_monitor.providers.base import CampaignProvider
@@ -72,10 +72,19 @@ class AuPayProvider(CampaignProvider):
             target = listing_target or match_target(title, description)
             if not target or not has_regional_benefit(title, description, leading_body):
                 continue
+            # 詳細ページを最優先する。一覧ページの親要素には別記事の日付が
+            # 混ざることがあるため、カード文言は最後の補助候補にだけ使う。
             start, end, period = extract_best_date_range(
-                detail_soup, listing_context, title, description
+                detail_soup, title, description, listing_context
             )
             if not start:
+                continue
+            # 検索結果には前年の記事も残る。終了済み、または終了日不明で
+            # 半年以上前に始まった記事は新着監視へ混ぜない。
+            reference_day = today or date.today()
+            if (end and end < reference_day) or (
+                end is None and start < reference_day - timedelta(days=180)
+            ):
                 continue
             campaigns.append(
                 Campaign(

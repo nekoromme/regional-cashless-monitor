@@ -87,7 +87,19 @@ class AuPayProvider(CampaignProvider):
             if title_start:
                 start = title_start
                 period = title_period or period
-                if end is not None and end < start:
+                description_start, description_end, description_period = (
+                    extract_date_range(description)
+                )
+                if (
+                    description_start == title_start
+                    and description_end is not None
+                    and description_end > title_start
+                ):
+                    end = description_end
+                    period = description_period or period
+                elif end is not None and end <= start:
+                    # 本文全体の関連記事から同じ開始日を再取得しただけなら、
+                    # 1日限定キャンペーンとはみなさない。
                     end = None
             if not start:
                 if len(decision_notes) < 12:

@@ -325,7 +325,7 @@ def run_monitor(
 
         needs_notification = record.get("last_notified_fingerprint") != campaign.fingerprint
         needs_calendar = record.get("calendar_fingerprint") != campaign.fingerprint
-        if needs_notification:
+        if needs_notification and notifier.enabled:
             notifier.send_campaign(
                 campaign,
                 detected_at=now,
@@ -345,8 +345,16 @@ def run_monitor(
             )
             # Calendarだけ失敗した時にDiscordを重ねて送らないよう、ここで確定保存。
             save_state(state_path, state)
+        elif needs_notification:
+            # Secretをまだ登録していなくても監視と状態保存は続ける。
+            # Webhook追加後の実行で、未通知の案件だけを改めて送る。
+            audit.write(
+                "discord_deferred",
+                campaign_id=campaign.campaign_id,
+                reason="DISCORD_WEBHOOK_URL未設定",
+            )
 
-        if needs_calendar:
+        if needs_calendar and calendar.enabled:
             event_id = calendar.upsert_campaign(campaign)
             record["calendar_event_id"] = event_id
             record["calendar_fingerprint"] = campaign.fingerprint
@@ -358,6 +366,14 @@ def run_monitor(
                 date=campaign.start_date.isoformat(),
             )
             save_state(state_path, state)
+        elif needs_calendar:
+            # Googleサービスアカウントを使わず、外部のカレンダー同期から
+            # state/state.jsonを読む構成でも監視本体を失敗させない。
+            audit.write(
+                "calendar_deferred",
+                campaign_id=campaign.campaign_id,
+                reason="Google Calendar直接連携未設定",
+            )
 
     save_state(state_path, state)
     return summary

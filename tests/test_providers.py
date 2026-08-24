@@ -108,7 +108,7 @@ def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
         """
     pages[wanted] = """
       <html><head><meta name="description" content="宮城県仙台市にて2026年10月1日から10月31日の間、au PAY残高に最大20％還元します。"></head>
-      <body><h1>【自治体キャンペーン】宮城県 仙台市の対象店舗で最大20％還元</h1>
+      <body><h1>【自治体キャンペーン】宮城県 仙台市の対象店舗で最大20％還元（2026年10月1日～）</h1>
       <h2>実施期間</h2><p>2026年10月1日～2026年10月31日</p></body></html>
     """
     pages[stale] = """

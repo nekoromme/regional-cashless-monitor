@@ -1,10 +1,9 @@
 name: Regional cashless campaign monitor
 
 on:
-  schedule:
-    # UTC 00:17 / 09:17 = 日本時間 09:17 / 18:17。
-    # 正時を避け、GitHub Actionsの混雑による遅延を少し減らす。
-    - cron: "17 0,9 * * *"
+  # 定期実行は、既存Secretを安全に再利用できる
+  # nekoromme/tcg-box-monitor-public 側の中継Workflowが担当する。
+  # このWorkflowは解析確認・復旧用の手動実行として残す。
   workflow_dispatch:
     inputs:
       mode:

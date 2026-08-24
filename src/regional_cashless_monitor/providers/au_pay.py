@@ -11,6 +11,7 @@ from regional_cashless_monitor.providers.common import (
     discover_links,
     element_text,
     extract_best_date_range,
+    extract_date_range,
     extract_reward,
     has_regional_benefit,
     soup_from_html,
@@ -77,6 +78,14 @@ class AuPayProvider(CampaignProvider):
             start, end, period = extract_best_date_range(
                 detail_soup, title, description, listing_context
             )
+            # au PAYの記事名にある「（2026年8月17日～）」は、その記事自身の
+            # 開始日として最も信頼できる。本文下部の関連記事の日付より優先する。
+            title_start, _, title_period = extract_date_range(title)
+            if title_start:
+                start = title_start
+                period = title_period or period
+                if end is not None and end < start:
+                    end = None
             if not start:
                 continue
             # 検索結果には前年の記事も残る。終了済み、または終了日不明で

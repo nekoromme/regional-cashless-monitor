@@ -22,13 +22,9 @@ from regional_cashless_monitor.providers.common import (
 from regional_cashless_monitor.targets import match_target
 
 LIST_URL = "https://common-service.payment.rakuten.co.jp/campaigns/"
-API_URL = (
-    "https://common-service.payment.rakuten.co.jp/api/common/campaign-list"
-    "?mediaKey=common-campaign-list"
-)
-GRID_SCRIPT_URL = (
-    "https://common-service.payment.rakuten.co.jp/static/common/fragments/medias/"
-    "medias-grid.js"
+DATA_URL = (
+    "https://common-service.payment.rakuten.co.jp/ptcms/campaign-medias/"
+    "common-campaign-list.json"
 )
 OLD_DETAIL_PATH_RE = re.compile(r"^/campaign/20\d{2}/[^/]+/?$")
 NEW_DETAIL_PATH_RE = re.compile(r"^/campaigns/[^/?#]+/?$")
@@ -47,6 +43,9 @@ class RakutenPayProvider(CampaignProvider):
 
         def walk(value: object, inherited: tuple[str, ...] = ()) -> None:
             if isinstance(value, dict):
+                # 公式画面と同じく、ゲスト非表示のカードは監視対象にしない。
+                if value.get("showForGuest") is False:
+                    return
                 local = tuple(
                     str(item)
                     for item in value.values()
@@ -82,42 +81,13 @@ class RakutenPayProvider(CampaignProvider):
     def fetch_campaigns(self, *, today: date | None = None):
         # 旧URLはmeta refreshだけになった。現在の公式一覧が使う公開JSONを直接読む。
         raw_html = self.client.get_text(LIST_URL)
+        data_raw = self.client.get_text(DATA_URL)
         try:
-            api_raw = self.client.get_text(API_URL)
-        except Exception as api_error:
-            javascript = self.client.get_text(GRID_SCRIPT_URL)
-            marker = "/api/common/campaign-list"
-            position = javascript.find(marker)
-            start = max(0, position - 1800)
-            end = min(len(javascript), position + 2500)
-            raise RuntimeError(
-                f"楽天ペイ公式JSONの取得に失敗: {api_error!r}; "
-                f"取得処理周辺={javascript[start:end]!r}"
-            ) from api_error
-        try:
-            payload = json.loads(api_raw)
+            payload = json.loads(data_raw)
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"楽天ペイ公式キャンペーンJSONを解釈できません: {exc}") from exc
 
         links = self._links_from_api(payload)
-        # API形式変更時にURL文字列だけは拾える可能性があるため、JSON文字列も補助探索する。
-        embedded_new = discover_links(
-            api_raw,
-            base_url=LIST_URL,
-            allowed_host="common-service.payment.rakuten.co.jp",
-            path_pattern=NEW_DETAIL_PATH_RE,
-            limit=100,
-        )
-        embedded_old = discover_links(
-            api_raw,
-            base_url=LIST_URL,
-            allowed_host="pay.rakuten.co.jp",
-            path_pattern=OLD_DETAIL_PATH_RE,
-            limit=100,
-        )
-        known = {url for url, _ in links}
-        links.extend(item for item in embedded_new + embedded_old if item[0] not in known)
-
         # HTML直書きへ戻った場合にも対応する。
         page_new = discover_links(
             raw_html,
@@ -138,7 +108,7 @@ class RakutenPayProvider(CampaignProvider):
         if not links:
             raise RuntimeError(
                 "楽天ペイ公式JSONからキャンペーンURLを1件も取得できません。"
-                f" JSON先頭={api_raw[:1000]!r}"
+                f" JSON先頭={data_raw[:1000]!r}"
             )
 
         campaigns: list[Campaign] = []
@@ -182,7 +152,7 @@ class RakutenPayProvider(CampaignProvider):
 
         diagnostic = FetchDiagnostic(
             provider=self.provider,
-            url=API_URL,
+            url=DATA_URL,
             ok=True,
             discovered_links=len(links),
             parsed_campaigns=len(campaigns),

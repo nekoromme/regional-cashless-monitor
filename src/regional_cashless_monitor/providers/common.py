@@ -388,13 +388,23 @@ def extract_reward(*texts: str) -> str | None:
 
 
 def has_regional_benefit(*texts: str) -> bool:
-    combined = normalize_text(" ".join(texts))
-    if any(blocked in combined for blocked in ("プレミアム商品券", "自治体マイナポイント")):
-        return False
-    return any(
-        term in combined
-        for term in ("還元", "戻って", "ポイント進呈", "ポイントがもらえる", "ポイント付与")
+    # タイトル、概要、本文を別々に判定する。本文下部の関連記事に
+    # 「プレミアム商品券」があっても、明確なポイント還元記事を落とさない。
+    benefit_terms = (
+        "還元",
+        "戻って",
+        "ポイント進呈",
+        "ポイントがもらえる",
+        "ポイント付与",
     )
+    blocked_terms = ("プレミアム商品券", "自治体マイナポイント")
+    for text in texts:
+        candidate = normalize_text(text)
+        if any(blocked in candidate for blocked in blocked_terms):
+            continue
+        if any(term in candidate for term in benefit_terms):
+            return True
+    return False
 
 
 def discover_links(

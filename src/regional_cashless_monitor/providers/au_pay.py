@@ -60,6 +60,7 @@ class AuPayProvider(CampaignProvider):
             )
 
         campaigns: list[Campaign] = []
+        decision_notes: list[str] = []
         for url, listing_context in all_links.items():
             listing_target = match_target(listing_context)
             # 検索結果カードに十分な記事名がある場合、対象外地域は詳細を読まない。
@@ -72,6 +73,8 @@ class AuPayProvider(CampaignProvider):
             leading_body = element_text(detail_soup.body)[:8000]
             target = listing_target or match_target(title, description)
             if not target or not has_regional_benefit(title, description, leading_body):
+                if target and len(decision_notes) < 12:
+                    decision_notes.append(f"還元判定外:{url}")
                 continue
             # 詳細ページを最優先する。一覧ページの親要素には別記事の日付が
             # 混ざることがあるため、カード文言は最後の補助候補にだけ使う。
@@ -87,6 +90,8 @@ class AuPayProvider(CampaignProvider):
                 if end is not None and end < start:
                     end = None
             if not start:
+                if len(decision_notes) < 12:
+                    decision_notes.append(f"日付なし:{url}")
                 continue
             # 検索結果には前年の記事も残る。終了済み、または終了日不明で
             # 半年以上前に始まった記事は新着監視へ混ぜない。
@@ -94,7 +99,15 @@ class AuPayProvider(CampaignProvider):
             if (end and end < reference_day) or (
                 end is None and start < reference_day - timedelta(days=180)
             ):
+                if len(decision_notes) < 12:
+                    decision_notes.append(
+                        f"期間外:{url}:{start.isoformat()}:{end.isoformat() if end else '-'}"
+                    )
                 continue
+            if len(decision_notes) < 12:
+                decision_notes.append(
+                    f"採用:{url}:{start.isoformat()}:{end.isoformat() if end else '-'}"
+                )
             campaigns.append(
                 Campaign(
                     provider=self.provider,
@@ -119,7 +132,7 @@ class AuPayProvider(CampaignProvider):
                 ok=item.ok,
                 discovered_links=item.discovered_links,
                 parsed_campaigns=len(campaigns),
-                detail=item.detail,
+                detail=f"{item.detail} 判定={' | '.join(decision_notes)}",
             )
             for item in diagnostics
         ]

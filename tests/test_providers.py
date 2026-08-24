@@ -95,12 +95,14 @@ def test_dpay_detail_uses_oshu_for_mizusawa_scope() -> None:
 def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
     wanted = "https://media.aupay.wallet.auone.jp/articles/6001/"
     ignored = "https://media.aupay.wallet.auone.jp/articles/6002/"
+    stale = "https://media.aupay.wallet.auone.jp/articles/5001/"
     pages = {}
     for index, list_url in enumerate(LIST_URLS):
         pages[list_url] = f"""
           <html><body>
             <div><a href="{wanted}">【自治体キャンペーン】宮城県 仙台市で最大20％還元</a></div>
             <div><a href="{ignored}">【自治体キャンペーン】岩手県 遠野市で最大20％還元</a></div>
+            <div><a href="{stale}">【自治体キャンペーン】千葉県で最大10％還元（2025年8月1日～）</a></div>
             <div><a href="/articles/{7000 + index}/">一般キャンペーン</a></div>
           </body></html>
         """
@@ -109,13 +111,19 @@ def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
       <body><h1>【自治体キャンペーン】宮城県 仙台市の対象店舗で最大20％還元</h1>
       <h2>実施期間</h2><p>2026年10月1日～2026年10月31日</p></body></html>
     """
+    pages[stale] = """
+      <html><head><meta name="description" content="千葉県で2025年8月1日から8月31日まで最大10％還元します。"></head>
+      <body><h1>【自治体キャンペーン】千葉県で最大10％還元（2025年8月1日～）</h1></body></html>
+    """
     # 対象外カードは一覧文だけで判定できるため、その詳細ページは用意しない。
     for index in range(3):
         pages[f"https://media.aupay.wallet.auone.jp/articles/{7000 + index}/"] = """
           <html><body><h1>一般キャンペーン</h1><p>全国のお店でクーポン</p></body></html>
         """
 
-    campaigns, _ = AuPayProvider(client=FakeClient(pages)).fetch_campaigns()
+    campaigns, _ = AuPayProvider(client=FakeClient(pages)).fetch_campaigns(
+        today=date(2026, 8, 24)
+    )
     assert len(campaigns) == 1
     assert campaigns[0].target.label == "仙台市"
     assert campaigns[0].start_date == date(2026, 10, 1)

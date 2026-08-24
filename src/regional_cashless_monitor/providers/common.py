@@ -24,6 +24,7 @@ SHORT_DATE_RE = re.compile(
     r"(?<!\d)(?P<month>\d{1,2})\s*[月./-]\s*(?P<day>\d{1,2})\s*日?"
 )
 RANGE_MARK_RE = re.compile(r"[~〜～－―ー]\s*")
+FROM_MARK_RE = re.compile(r"(?:から|より)\s*")
 REWARD_PATTERNS = (
     re.compile(r"最大\s*\d+(?:\.\d+)?\s*[%％]\s*(?:分)?(?:還元|戻)") ,
     re.compile(r"\d+(?:\.\d+)?\s*[%％]\s*(?:分)?(?:還元|戻)") ,
@@ -298,28 +299,40 @@ def extract_date_range(text: str) -> tuple[date | None, date | None, str | None]
     if start is None:
         return None, None, None
 
+    # 文中の無関係な「公開日」「関連記事の日付」を終了日と誤認しないよう、
+    # 開始日の直後に範囲記号（～）か「から／より」がある時だけ終了日を読む。
     end: date | None = None
     end_match_end = first.end()
-    if len(full_matches) >= 2:
-        second = full_matches[1]
-        end = _safe_date(
-            int(second.group("year")),
-            int(second.group("month")),
-            int(second.group("day")),
-        )
-        end_match_end = second.end()
-    else:
-        tail = cleaned[first.end() :]
-        range_marker = RANGE_MARK_RE.search(tail)
-        if range_marker:
-            short = SHORT_DATE_RE.search(tail, range_marker.end())
+    tail = cleaned[first.end() :]
+    marker_candidates = [
+        match
+        for match in (RANGE_MARK_RE.search(tail[:80]), FROM_MARK_RE.search(tail[:80]))
+        if match is not None
+    ]
+    range_marker = min(marker_candidates, key=lambda item: item.start()) if marker_candidates else None
+    if range_marker:
+        after_marker = tail[range_marker.end() : range_marker.end() + 80]
+        full_end = FULL_DATE_RE.search(after_marker)
+        if full_end:
+            end = _safe_date(
+                int(full_end.group("year")),
+                int(full_end.group("month")),
+                int(full_end.group("day")),
+            )
+            end_match_end = first.end() + range_marker.end() + full_end.end()
+        else:
+            short = SHORT_DATE_RE.search(after_marker)
             if short:
                 end_year = start.year
                 end_month = int(short.group("month"))
                 if end_month < start.month:
                     end_year += 1
                 end = _safe_date(end_year, end_month, int(short.group("day")))
-                end_match_end = first.end() + short.end()
+                end_match_end = first.end() + range_marker.end() + short.end()
+
+    # 公式ページ側の本文結合が崩れても、開始日より前の終了日は採用しない。
+    if end is not None and end < start:
+        end = None
 
     period = cleaned[max(0, first.start() - 30) : min(len(cleaned), end_match_end + 30)]
     return start, end, period or None
@@ -400,7 +413,14 @@ def discover_links(
         url = canonical_url(base_url, str(anchor["href"]))
         parts = urlsplit(url)
         if parts.netloc == allowed_host and path_pattern.search(parts.path):
-            context = element_text(anchor.parent if isinstance(anchor.parent, Tag) else anchor)
+            # au PAYの検索ページは親要素が記事一覧全体になることがある。
+            # リンク自身に記事名があるなら、それだけをカード文脈として使う。
+            anchor_text = element_text(anchor)
+            context = anchor_text
+            if len(anchor_text) < 10:
+                context = element_text(
+                    anchor.parent if isinstance(anchor.parent, Tag) else anchor
+                )
             found.setdefault(url, context)
 
     # JavaScriptでカードを描くページ向け。HTML内のURL文字列も補助的に拾う。

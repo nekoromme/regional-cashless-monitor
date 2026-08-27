@@ -14,6 +14,7 @@ from regional_cashless_monitor.providers.common import (
     extract_date_range,
     extract_reward,
     has_regional_benefit,
+    is_store_or_facility_offer,
     soup_from_html,
     title_and_description,
 )
@@ -63,6 +64,15 @@ class AuPayProvider(CampaignProvider):
         decision_notes: list[str] = []
         for url, listing_context in all_links.items():
             listing_target = match_target(listing_context)
+            # 検索ページの関連記事・人気記事もdiscover_linksには見える。
+            # au PAYの自治体記事は過去分を含め、記事名に必ず
+            # 「自治体キャンペーン」と明記される。長い別企画名はここで落とす。
+            if (
+                listing_context
+                and len(listing_context) >= 20
+                and "自治体キャンペーン" not in listing_context
+            ):
+                continue
             # 検索結果カードに十分な記事名がある場合、対象外地域は詳細を読まない。
             # 「詳細はこちら」のような短いリンクだけなら、取りこぼし防止で詳細を確認する。
             if listing_context and len(listing_context) >= 20 and not listing_target:
@@ -71,10 +81,24 @@ class AuPayProvider(CampaignProvider):
             detail_soup = soup_from_html(self.client.get_text(url))
             title, description = title_and_description(detail_soup)
             leading_body = element_text(detail_soup.body)[:8000]
-            target = listing_target or match_target(title, description)
-            if not target or not has_regional_benefit(title, description, leading_body):
-                if target and len(decision_notes) < 12:
-                    decision_notes.append(f"還元判定外:{url}")
+            # 一覧カードの地域判定は、詳細記事が別企画だった場合には引き継がない。
+            # 関連記事に自治体還元が載っていても、記事自身のタイトル・概要だけで
+            # 「自治体」「対象地域」「還元」の3条件を満たす必要がある。
+            target = match_target(title, description)
+            is_municipal_article = "自治体キャンペーン" in title
+            is_store_offer = is_store_or_facility_offer(title, description)
+            has_own_benefit = has_regional_benefit(title, description)
+            if not target or not is_municipal_article or is_store_offer or not has_own_benefit:
+                if len(decision_notes) < 12:
+                    if not is_municipal_article:
+                        reason = "自治体表記なし"
+                    elif is_store_offer:
+                        reason = "店舗施設企画"
+                    elif not has_own_benefit:
+                        reason = "記事自身に還元表記なし"
+                    else:
+                        reason = "対象地域外"
+                    decision_notes.append(f"{reason}:{url}")
                 continue
             # 詳細ページを最優先する。一覧ページの親要素には別記事の日付が
             # 混ざることがあるため、カード文言は最後の補助候補にだけ使う。

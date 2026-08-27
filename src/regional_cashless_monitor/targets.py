@@ -71,7 +71,14 @@ def normalize_text(value: str) -> str:
 
 
 def _is_prefecture_wide(text: str, prefecture: str) -> bool:
-    """県名の直後に市区町村名が無い、県全域らしい表現だけを許可する。"""
+    """県名だけでなく、県全域だと分かる文言がある場合だけ許可する。
+
+    県名は店舗・商業施設の所在地としても頻繁に書かれる。
+    そのため「千葉県 船橋FACE」のように県名の後ろが空白というだけでは
+    県キャンペーンにしない。過去の自治体キャンペーンで実際に使われた
+    「県内」「県の対象店舗」「県で最大○％」「県にて20xx年」などを
+    肯定材料にする。
+    """
 
     location = text.find(prefecture)
     if location < 0:
@@ -83,12 +90,38 @@ def _is_prefecture_wide(text: str, prefecture: str) -> bool:
 
     escaped = re.escape(prefecture)
     patterns = (
-        rf"(?:^|[【\[〈(（:：、 ]){escaped}(?:\s*第\s*\d+\s*弾)?(?:$|[】\]〉)）、,:： ])",
+        # PayPay一覧などの短い「岩手県 第3弾」というカード名。
+        rf"^{escaped}(?:\s*第\s*\d+\s*弾)?$",
         rf"{escaped}(?:内|全域)(?:の|で|にて|対象|$)",
         rf"{escaped}(?:の対象店舗|のお店|で最大|でお買い物|キャッシュレス)",
         rf"{escaped}にて\s*20\d{{2}}年",
     )
     return any(re.search(pattern, text) for pattern in patterns)
+
+
+def _is_city_scope(text: str, target: NamedTarget) -> bool:
+    """市名の省略形を店舗名の一部と取り違えないようにする。"""
+
+    for alias in target.aliases:
+        if alias not in text:
+            continue
+        # 正式な自治体名・区名は、それ自体が十分に強い地域表記。
+        if alias.endswith(("市", "区")):
+            return True
+
+        escaped = re.escape(alias)
+        # 「盛岡駅ビル」「仙台PARCO」「一関店」のような施設・店名は除外し、
+        # 過去の自治体案件で使われる地域としてのつながりだけを許可する。
+        patterns = (
+            rf"^{escaped}$",
+            rf"{escaped}(?:内|全域|地域|エリア)(?:の|で|にて|対象|$)",
+            rf"{escaped}(?:の対象店舗|のお店|で最大|でお買い物|キャッシュレス)",
+            rf"{escaped}にて\s*20\d{{2}}年",
+            rf"{escaped}\s*第\s*\d+\s*弾",
+        )
+        if any(re.search(pattern, text) for pattern in patterns):
+            return True
+    return False
 
 
 def match_target(*texts: str) -> TargetMatch | None:
@@ -103,7 +136,7 @@ def match_target(*texts: str) -> TargetMatch | None:
         return None
 
     for target in CITY_TARGETS:
-        if any(alias in combined for alias in target.aliases):
+        if _is_city_scope(combined, target):
             return TargetMatch(target.key, target.label, "city")
 
     for prefecture in PREFECTURES:

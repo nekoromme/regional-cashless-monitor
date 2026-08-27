@@ -16,6 +16,7 @@ from regional_cashless_monitor.providers.common import (
     extract_best_date_range,
     extract_reward,
     has_regional_benefit,
+    is_store_or_facility_offer,
     soup_from_html,
     title_and_description,
 )
@@ -127,7 +128,11 @@ class RakutenPayProvider(CampaignProvider):
             title, description = title_and_description(detail_soup)
             target = listing_target or match_target(title, description)
             leading_body = element_text(detail_soup.body)[:8000]
-            if not target or not has_regional_benefit(title, description, leading_body):
+            if (
+                not target
+                or is_store_or_facility_offer(title, description)
+                or not has_regional_benefit(title, description)
+            ):
                 continue
             start, end, period = extract_best_date_range(
                 detail_soup, title, description, listing_context

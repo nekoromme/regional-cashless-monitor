@@ -13,6 +13,7 @@ from regional_cashless_monitor.providers.common import (
     extract_best_date_range,
     extract_reward,
     has_regional_benefit,
+    is_store_or_facility_offer,
     soup_from_html,
     title_and_description,
 )
@@ -54,8 +55,12 @@ class DPayProvider(CampaignProvider):
             detail_soup = soup_from_html(self.client.get_text(url))
             title, description = title_and_description(detail_soup)
             leading_body = element_text(detail_soup.body)[:10000]
-            target = listing_target or match_target(title, description, leading_body[:1200])
-            if not target or not has_regional_benefit(title, description, leading_body):
+            target = listing_target or match_target(title, description)
+            if (
+                not target
+                or is_store_or_facility_offer(title, description)
+                or not has_regional_benefit(title, description)
+            ):
                 continue
             start, end, period = extract_best_date_range(
                 detail_soup, listing_context, title, description

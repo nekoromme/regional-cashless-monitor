@@ -407,6 +407,26 @@ def has_regional_benefit(*texts: str) -> bool:
     return False
 
 
+def is_store_or_facility_offer(*texts: str) -> bool:
+    """店舗・商業施設が独自に出す割引企画らしい文言を検出する。
+
+    自治体還元でも「対象店舗」という語は普通に使うため、それだけでは
+    除外しない。「対象店舗で使えるクーポン」「○○店限定」など、対象が
+    店舗・施設へ絞られていることが明確な組み合わせだけを使う。
+    """
+
+    combined = normalize_text(" ".join(text for text in texts if text))
+    if not combined:
+        return False
+    patterns = (
+        r"対象店舗で使える.{0,40}(?:割引|クーポン)",
+        r"(?:割引|値引き).{0,20}クーポン",
+        r"クーポン.{0,30}(?:プレゼント|配布|進呈)",
+        r"(?:店|店舗|施設|会場)限定",
+    )
+    return any(re.search(pattern, combined) for pattern in patterns)
+
+
 def discover_links(
     raw_html: str,
     *,

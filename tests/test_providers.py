@@ -96,6 +96,7 @@ def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
     wanted = "https://media.aupay.wallet.auone.jp/articles/6001/"
     ignored = "https://media.aupay.wallet.auone.jp/articles/6002/"
     stale = "https://media.aupay.wallet.auone.jp/articles/5001/"
+    store_offer = "https://media.aupay.wallet.auone.jp/articles/5215/"
     pages = {}
     for index, list_url in enumerate(LIST_URLS):
         pages[list_url] = f"""
@@ -103,6 +104,7 @@ def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
             <div><a href="{wanted}">【自治体キャンペーン】宮城県 仙台市で最大20％還元</a></div>
             <div><a href="{ignored}">【自治体キャンペーン】岩手県 遠野市で最大20％還元</a></div>
             <div><a href="{stale}">【自治体キャンペーン】千葉県で最大10％還元（2025年8月1日～）</a></div>
+            <script>window.relatedArticle = "{store_offer}";</script>
             <div><a href="/articles/{7000 + index}/">一般キャンペーン</a></div>
           </body></html>
         """
@@ -114,6 +116,17 @@ def test_au_pay_reads_search_pages_and_ignores_unlisted_city() -> None:
     pages[stale] = """
       <html><head><meta name="description" content="千葉県で2025年8月1日から8月31日まで最大10％還元します。"></head>
       <body><h1>【自治体キャンペーン】千葉県で最大10％還元（2025年8月1日～）</h1></body></html>
+    """
+    pages[store_offer] = """
+      <html><head><meta name="description" content="2026年9月4日から10月30日まで、千葉県 船橋FACEの対象店舗にて最大30％割引クーポンをプレゼントします。"></head>
+      <body>
+        <h1>au PAY、千葉県 船橋FACEの対象店舗で使える最大30％割引クーポンをプレゼント（2026年9月4日～）</h1>
+        <p>2026年9月4日から10月30日まで、船橋FACEの対象店舗で使えるクーポンです。</p>
+        <section class="related-posts">
+          <h2>【自治体キャンペーン】千葉県の対象店舗で最大20％還元</h2>
+          <p>千葉県にて2026年9月1日から9月30日まで最大20％還元します。</p>
+        </section>
+      </body></html>
     """
     # 対象外カードは一覧文だけで判定できるため、その詳細ページは用意しない。
     for index in range(3):
